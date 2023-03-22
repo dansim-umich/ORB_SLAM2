@@ -56,25 +56,62 @@ if you use ORB-SLAM2 (Stereo or RGB-D) in an academic work, please cite:
      }
 
 # 2. Prerequisites
-We have tested the library in **Ubuntu 12.04**, **14.04** and **16.04**, but it should be easy to compile in other platforms. A powerful computer (e.g. i7) will ensure real-time performance and provide more stable and accurate results.
+We have tested the library in **Ubuntu 12.04**, **14.04** and **16.04**, but it should be easy to compile in other platforms. A powerful computer (e.g. i7) will ensure real-time performance and provide more stable and accurate results. **Ubuntu 18.04**
 
 ## C++11 or C++0x Compiler
 We use the new thread and chrono functionalities of C++11.
 
+## OpenCV 3.2.0
+We use [OpenCV](http://opencv.org) to manipulate images and features. Dowload with:
+```
+wget https://github.com/opencv/opencv/archive/3.2.0.zip
+```
+Copy and Paste
+```
+#define AV_CODEC_FLAG_GLOBAL_HEADER (1 << 22)
+#define CODEC_FLAG_GLOBAL_HEADER AV_CODEC_FLAG_GLOBAL_HEADER
+#define AVFMT_RAWPICTURE 0x0020
+```
+To the top of
+```
+opencv/modules/videoio/src/cap_ffmpeg_impl.hpp
+```
+and change:
+```
+char* str = PyString_AsString(obj);
+```
+to:
+```
+const char* str = PyString_AsString(obj);
+```
+in line 730 of
+```
+opencv/modules/python/src2/cv2
+```
+
+Install instructions can be found at: https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html.
+**When doing cmake step add -DENABLE_PRECOMPILED_HEADERS=OFF**
+
+## Eigen 3.2.10
+Required by g2o (see below). Download with:
+```
+wget https://gitlab.com/libeigen/eigen/-/archive/3.2.10/eigen-3.2.10.zip
+```
+Follow OpenCV install instructions
+
 ## Pangolin
-We use [Pangolin](https://github.com/stevenlovegrove/Pangolin) for visualization and user interface. Dowload and install instructions can be found at: https://github.com/stevenlovegrove/Pangolin.
-
-## OpenCV
-We use [OpenCV](http://opencv.org) to manipulate images and features. Dowload and install instructions can be found at: http://opencv.org. **Required at leat 2.4.3. Tested with OpenCV 2.4.11 and OpenCV 3.2**.
-
-## Eigen3
-Required by g2o (see below). Download and install instructions can be found at: http://eigen.tuxfamily.org. **Required at least 3.1.0**.
+We use Pangolin v0.5 for visualization and user interface. Dowload and install with:
+```
+git clone --recursive https://github.com/stevenlovegrove/Pangolin.git -b v0.5
+```
+Then follow steps install steps in ReadMe.
 
 ## DBoW2 and g2o (Included in Thirdparty folder)
 We use modified versions of the [DBoW2](https://github.com/dorian3d/DBoW2) library to perform place recognition and [g2o](https://github.com/RainerKuemmerle/g2o) library to perform non-linear optimizations. Both modified libraries (which are BSD) are included in the *Thirdparty* folder.
 
-## ROS (optional)
-We provide some examples to process the live input of a monocular, stereo or RGB-D camera using [ROS](ros.org). Building these examples is optional. In case you want to use ROS, a version Hydro or newer is needed.
+## ROS Melodic
+Follow [ROS](http://wiki.ros.org/melodic/Installation/Ubuntu) installation. All steps up to 1.6.1
+
 
 # 3. Building ORB-SLAM2 library and examples
 
