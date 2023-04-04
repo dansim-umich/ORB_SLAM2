@@ -56,7 +56,7 @@ if you use ORB-SLAM2 (Stereo or RGB-D) in an academic work, please cite:
      }
 
 # 2. Prerequisites
-We have tested the library in **Ubuntu 12.04**, **14.04** and **16.04**, but it should be easy to compile in other platforms. A powerful computer (e.g. i7) will ensure real-time performance and provide more stable and accurate results. **Ubuntu 18.04**
+**Ubuntu 18.04** environment
 
 ## C++11 or C++0x Compiler
 We use the new thread and chrono functionalities of C++11.
@@ -99,10 +99,12 @@ wget https://gitlab.com/libeigen/eigen/-/archive/3.2.10/eigen-3.2.10.zip
 ```
 Follow OpenCV install instructions
 
-## Pangolin
+## Pangolin 0.5
 We use Pangolin v0.5 for visualization and user interface. Dowload and install with:
 ```
 git clone --recursive https://github.com/stevenlovegrove/Pangolin.git -b v0.5
+sudo apt-get install libgl1-mesa-dev
+sudo apt install libglew-dev
 ```
 Then follow steps install steps in ReadMe.
 
@@ -117,7 +119,7 @@ Follow [ROS](http://wiki.ros.org/melodic/Installation/Ubuntu) installation. All 
 
 Clone the repository:
 ```
-git clone https://github.com/raulmur/ORB_SLAM2.git ORB_SLAM2
+git clone https://github.com/dansim-umich/ORB_SLAM2.git ORB_SLAM2
 ```
 
 We provide a script `build.sh` to build the *Thirdparty* libraries and *ORB-SLAM2*. Please make sure you have installed all required dependencies (see section 2). Execute:
