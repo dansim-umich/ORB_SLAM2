@@ -74,6 +74,8 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     mvLevelSigma2 = mpORBextractorLeft->GetScaleSigmaSquares();
     mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
 
+    // LoFTR - extraction and matching.
+
     // ORB extraction
     thread threadLeft(&Frame::ExtractORB,this,0,imLeft);
     thread threadRight(&Frame::ExtractORB,this,1,imRight);
@@ -250,6 +252,17 @@ void Frame::ExtractORB(int flag, const cv::Mat &im)
         (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors);
     else
         (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight);
+}
+
+void Frame::ExtractLoFTR_and_match(const cv::Mat &imLeft, const cv::Mat &imRight)
+{
+    /*
+        Feed imLeft and imRight into LoFTR to obtain their keypoints
+        and feature vectors (aka descriptors).
+    */
+
+    // TODO
+
 }
 
 void Frame::SetPose(cv::Mat Tcw)
