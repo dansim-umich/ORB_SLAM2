@@ -259,6 +259,9 @@ void Frame::ExtractLoFTR_and_match(const cv::Mat &imLeft, const cv::Mat &imRight
     /*
         Feed imLeft and imRight into LoFTR to obtain their keypoints
         and feature vectors (aka descriptors).
+
+        Also compute uR for each left keypoint (uL, vL) and its 
+        corresponding depth value.
     */
 
     // TODO
@@ -478,6 +481,8 @@ void Frame::ComputeImageBounds(const cv::Mat &imLeft)
 
 void Frame::ComputeStereoMatches()
 {
+    // Create vectors of size 'number of keypoints in left image' and 
+    // store a default value of -1.
     mvuRight = vector<float>(N,-1.0f);
     mvDepth = vector<float>(N,-1.0f);
 
@@ -488,6 +493,7 @@ void Frame::ComputeStereoMatches()
     //Assign keypoints to row table
     vector<vector<size_t> > vRowIndices(nRows,vector<size_t>());
 
+    // Reserve enough space for atleast 200 elements in each row
     for(int i=0; i<nRows; i++)
         vRowIndices[i].reserve(200);
 
