@@ -98,6 +98,10 @@ public:
     // Backprojects a keypoint (if stereo/depth info available) into 3D world coordinates.
     cv::Mat UnprojectStereo(const int &i);
 
+    // dansim
+    int call_LoFTR(cv::Mat img1, cv::Mat img2, std::vector<std::vector<double>> &left_matches, std::vector<std::vector<double>> &right_matches, std::vector<std::vector<double>> &left_keyp, std::vector<std::vector<double>> &right_keyp);
+    // dansim
+
 public:
     // Vocabulary used for relocalization.
     ORBVocabulary* mpORBvocabulary;

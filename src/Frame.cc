@@ -22,6 +22,13 @@
 #include "Converter.h"
 #include "ORBmatcher.h"
 #include <thread>
+// dansim
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+#include <stdio.h>
+#include <numpy/arrayobject.h>
+#include <pthread.h>
+// dansim
 
 namespace ORB_SLAM2
 {
@@ -62,6 +69,17 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     :mpORBvocabulary(voc),mpORBextractorLeft(extractorLeft),mpORBextractorRight(extractorRight), mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
      mpReferenceKF(static_cast<KeyFrame*>(NULL))
 {
+
+    // dansim
+    std::vector<std::vector<double>> left_matches;
+    std::vector<std::vector<double>> right_matches;
+    std::vector<std::vector<double>> left_keyp;
+    std::vector<std::vector<double>> right_keyp;
+    //cv::imshow("Display window", imLeft);
+    call_LoFTR(imLeft, imRight, left_matches, right_matches, left_keyp, right_keyp);
+    // dansim
+
+
     // Frame ID
     mnId=nNextId++;
 
@@ -678,5 +696,113 @@ cv::Mat Frame::UnprojectStereo(const int &i)
     else
         return cv::Mat();
 }
+
+const char* depthToStr(int depth) {
+  switch(depth){
+    case CV_8U: return "unsigned char";
+    case CV_8S: return "char";
+    case CV_16U: return "unsigned short";
+    case CV_16S: return "short";
+    case CV_32S: return "int";
+    case CV_32F: return "float";
+    case CV_64F: return "double";
+  }
+  return "invalid type!";
+}
+
+// dansim
+int Frame::call_LoFTR(cv::Mat img1, cv::Mat img2, std::vector<std::vector<double>> &left_matches, std::vector<std::vector<double>> &right_matches, std::vector<std::vector<double>> &left_keyp, std::vector<std::vector<double>> &right_keyp)
+{
+    PyObject *pName, *pModule, *pFunc;
+    PyObject *pArgs, *pValue;
+    PyObject *in_array_1, *in_array_2;
+    PyObject *out_array[4];
+
+    if (!Py_IsInitialized())
+    {
+        Py_Initialize();
+    }
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString("sys.path.append(\"/home/dansim/LoFTR\")");
+    PyRun_SimpleString("sys.path.append(\"/home/dansim/LoFTR/demo\")");
+    // allow access to file location
+    // define file name
+    pName = PyUnicode_DecodeFSDefault("SLAM_Matcher");
+    pModule = PyImport_Import(pName);
+    if (pModule == NULL)
+    {
+        printf("No python file found");
+        return 0;
+    }
+    Py_DECREF(pName);
+    // define function name
+    pFunc = PyObject_GetAttrString(pModule, "match_images");
+    if (!(pFunc && PyCallable_Check(pFunc)))
+    {
+        printf("No python function found");
+        return 0;
+    }
+
+    // define arguments to pass
+    pArgs = PyTuple_New(2);
+    npy_intp dims_1[2] = {img1.rows, img1.cols};
+    npy_intp dims_2[2] = {img2.rows, img2.cols};
+    import_array();
+    uint8_t *ptr_1 = img1.ptr<uint8_t>(0);
+    uint8_t *ptr_2 = img2.ptr<uint8_t>(0);
+    in_array_1 = PyArray_SimpleNewFromData(2, dims_1, NPY_UINT8, ptr_1);
+    in_array_2 = PyArray_SimpleNewFromData(2, dims_2, NPY_UINT8, ptr_2);
+    PyTuple_SetItem(pArgs, 0, in_array_1);
+    PyTuple_SetItem(pArgs, 1, in_array_2);
+
+    // call function
+    pValue = PyObject_CallObject(pFunc, pArgs);
+    Py_DECREF(pFunc);
+    Py_DECREF(pArgs);
+    // edit pointers
+    std::vector<std::vector<double>> value[4];
+    value[0] = left_matches;
+    value[1] = right_matches;
+    value[2] = left_keyp;
+    value[3] = right_keyp;
+    int size[4];
+    int height[4];
+    int width[4];
+    int row;
+    int column;
+    for (int i=0; i<4; i++)
+    {
+        out_array[i] = PyList_GetItem(pValue, i);
+        size[i] = PyList_Size(out_array[i]);
+        height[i] = int(PyFloat_AsDouble(PyList_GetItem(out_array[i], 0)));
+        width[i] = int(PyFloat_AsDouble(PyList_GetItem(out_array[i], 1)));
+        value[i].clear();
+        value[i].resize(height[i], std::vector<double> (width[i], 0));
+        row = 0;
+        column = 0;
+        for (int j = 2; j < size[i]; j++)
+        {
+            value[i][row][column] = PyFloat_AsDouble(PyList_GetItem(out_array[i], j));
+            column = column + 1;
+            if (column == int(width[i]))
+            {
+                column = 0;
+                row = row + 1;
+            }
+        }
+    }
+    Py_DECREF(in_array_1);
+    Py_DECREF(in_array_2);
+    Py_DECREF(out_array[0]);
+    Py_DECREF(out_array[1]);
+    Py_DECREF(out_array[2]);
+    Py_DECREF(out_array[3]);
+    Py_DECREF(pModule);
+    Py_DECREF(pValue);
+    cout << "fin" << endl;
+    //Py_Finalize();
+    return 1;
+}
+// dansim
 
 } //namespace ORB_SLAM

@@ -36,6 +36,13 @@
 #include "ORBVocabulary.h"
 #include "Viewer.h"
 
+// dansim
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+#include <stdio.h>
+#include <numpy/arrayobject.h>
+// dansim
+
 namespace ORB_SLAM2
 {
 
@@ -121,6 +128,10 @@ public:
     int GetTrackingState();
     std::vector<MapPoint*> GetTrackedMapPoints();
     std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
+
+    // dansim
+    int call_LoFTR(cv::Mat img1, cv::Mat img2, std::vector<std::vector<double>> &left_matches, std::vector<std::vector<double>> &right_matches, std::vector<std::vector<double>> &left_keyp, std::vector<std::vector<double>> &right_keyp);
+    // dansim
 
 private:
 
