@@ -262,6 +262,13 @@ void Frame::ExtractLoFTR_and_match(const cv::Mat &imLeft, const cv::Mat &imRight
 
         Also compute uR for each left keypoint (uL, vL) and its 
         corresponding depth value.
+
+        Input: imLeft and imRight, these are the stereo grayscale images obtained from the camera.
+
+        Output: 
+            A.) keypoint vectors - kptsA, kptsB, where kptsA and kptsB are each of size [num_matches x 2]
+            B.) feature vectors - featA, featB, where featA and featB are each of size [num_matches x 384]
+
     */
 
     // TODO
