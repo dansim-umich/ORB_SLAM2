@@ -29,6 +29,8 @@
 #include "ORBVocabulary.h"
 #include "KeyFrame.h"
 #include "ORBextractor.h"
+#include "Thirdparty/DBoW3/DBoW3_and_LoFTR/src/BowVector.h"
+
 
 #include <opencv2/opencv.hpp>
 
@@ -65,6 +67,9 @@ public:
 
     // Compute Bag of Words representation.
     void ComputeBoW();
+
+    // Compute DBoW3 representation
+    void ComputeBoW3();
 
     // Set the camera pose.
     void SetPose(cv::Mat Tcw);
@@ -148,6 +153,9 @@ public:
     // Bag of Words Vector structures.
     DBoW2::BowVector mBowVec;
     DBoW2::FeatureVector mFeatVec;
+
+    // DBoW3::BowVector mBowVec3;
+    // DBoW3::FeatureVector mFeatVec3;
 
     // ORB descriptor, each row associated to a keypoint.
     cv::Mat mDescriptors, mDescriptorsRight;

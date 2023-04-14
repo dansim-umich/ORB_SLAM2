@@ -420,9 +420,31 @@ void Frame::ComputeBoW()
     if(mBowVec.empty())
     {
         vector<cv::Mat> vCurrentDesc = Converter::toDescriptorVector(mDescriptors);
+        // cout << "size of mDescriptor: " << mDescriptors.size() << "\n";
+        // cout << "size of vCurrentDesc: " << vCurrentDesc.size() << "\n";
+        // cout << "size of vCurrentDesc[0]" << vCurrentDesc.at(0).size() << "\n";
+        // cout << "=============================\n";
         mpORBvocabulary->transform(vCurrentDesc,mBowVec,mFeatVec,4);
+        cout << "mBowVec: " << mBowVec << "\n";
+        abort();
     }
 }
+
+// void Frame::ComputeBoW3()
+// {
+//     /*
+//         Function to compute a DBoW3 vector given features in frame
+//     */
+
+//     if(mBowVec3.empty())
+//     {
+//            // Convert [32 x 1206] cv matrix to a vector of 1206 cv matrices each holding
+//            // a cv matrix of size [32 x 1]
+//         vector<cv::Mat> vCurrentDesc = Converter::toDescriptorVector(mDescriptors);
+//            // Compute bag-of-words vector from given feature vectors
+//         mpLoFTRvocabulary->transform(vCurrentDesc,mBowVec,mFeatVec,4);
+//     }
+// }
 
 void Frame::UndistortKeyPoints()
 {
