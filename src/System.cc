@@ -61,14 +61,19 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     //Load ORB Vocabulary
     cout << endl << "Loading ORB Vocabulary. This could take a while..." << endl;
 
-    mpVocabulary = new ORBVocabulary();
-    bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
-    if(!bVocLoad)
-    {
-        cerr << "Wrong path to vocabulary. " << endl;
-        cerr << "Falied to open at: " << strVocFile << endl;
-        exit(-1);
-    }
+    // Load vocabulary from gz file
+    mpVocabulary = new ORBVocabulary(strVocFile);
+    mpVocabulary->load(strVocFile);
+
+    // Load vocabulary from txt file
+    // mpVocabulary = new ORBVocabulary();
+    // bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
+    // if(!bVocLoad)
+    // {
+    //     cerr << "Wrong path to vocabulary. " << endl;
+    //     cerr << "Falied to open at: " << strVocFile << endl;
+    //     exit(-1);
+    // }
     cout << "Vocabulary loaded!" << endl << endl;
 
     //Create KeyFrame Database

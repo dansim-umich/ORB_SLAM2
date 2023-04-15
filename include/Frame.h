@@ -29,9 +29,10 @@
 #include "ORBVocabulary.h"
 #include "KeyFrame.h"
 #include "ORBextractor.h"
-#include "Thirdparty/DBoW3/DBoW3_and_LoFTR/src/BowVector.h"
+// #include "Thirdparty/DBoW3/DBoW3_and_LoFTR/src/BowVector.h"
 
-
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
 #include <opencv2/opencv.hpp>
 
 namespace ORB_SLAM2
@@ -115,6 +116,9 @@ public:
 
     // Frame timestamp.
     double mTimeStamp;
+
+    // Frame cols
+    int nRows_pyramid;
 
     // Calibration matrix and OpenCV distortion parameters.
     cv::Mat mK;

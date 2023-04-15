@@ -251,7 +251,7 @@ For a stereo input from topic `/camera/left/image_raw` and `/camera/right/image_
   ```
   
   ```
-  rosbag play --pause V1_01_easy.bag /cam0/image_raw:=/camera/left/image_raw /cam1/image_raw:=/camera/right/image_raw
+  rosbag play --pause data/V1_01_easy.bag /cam0/image_raw:=/camera/left/image_raw /cam1/image_raw:=/camera/right/image_raw
   ```
   
 Once ORB-SLAM2 has loaded the vocabulary, press space in the rosbag tab. Enjoy!. Note: a powerful computer is required to run the most exigent sequences of this dataset.
