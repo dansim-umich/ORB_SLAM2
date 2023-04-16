@@ -88,8 +88,8 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     // threadLeft.join();
     // threadRight.join();
 
-    // cout << "mDescriptor[0]: " << mDescriptors.size() << "\n";
-    // cout << "mDescriptor[1]: " << mDescriptorsRight.size() << "\n";
+    cout << "mDescriptor[0]: " << mDescriptors.size() << "\n";
+    cout << "mDescriptor[1]: " << mDescriptorsRight.size() << "\n";
 
 
     N = mvKeys.size();
@@ -299,8 +299,11 @@ void Frame::ExtractLoFTR_and_match(const cv::Mat &imLeft, const cv::Mat &imRight
     */
 
     // Use random vectors to find keypoints and feature vectors
-    mDescriptors.create(1200, 32, CV_16U);
-    mDescriptorsRight.create(1200, 32, CV_16U);
+    // mDescriptors.create(1200, 32, CV_16U);
+    // mDescriptorsRight.create(1200, 32, CV_16U);
+
+    mDescriptors.create(1200, 384, CV_16U);
+    mDescriptorsRight.create(1200, 384, CV_16U);
 
     cv::randu(mDescriptors, cv::Scalar(0), cv::Scalar(300));
     cv::randu(mDescriptorsRight, cv::Scalar(0), cv::Scalar(300));
