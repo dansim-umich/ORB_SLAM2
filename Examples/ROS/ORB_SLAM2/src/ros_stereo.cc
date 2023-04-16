@@ -59,6 +59,9 @@ int main(int argc, char **argv)
         ros::shutdown();
         return 1;
     }    
+    // dansim
+    Py_Initialize();
+    // dansim
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::STEREO,true);

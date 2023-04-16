@@ -713,15 +713,12 @@ const char* depthToStr(int depth) {
 // dansim
 int Frame::call_LoFTR(cv::Mat img1, cv::Mat img2, std::vector<std::vector<double>> &left_matches, std::vector<std::vector<double>> &right_matches, std::vector<std::vector<double>> &left_keyp, std::vector<std::vector<double>> &right_keyp)
 {
+    cout << "call" << endl;
     PyObject *pName, *pModule, *pFunc;
     PyObject *pArgs, *pValue;
     PyObject *in_array_1, *in_array_2;
     PyObject *out_array[4];
 
-    if (!Py_IsInitialized())
-    {
-        Py_Initialize();
-    }
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.append(\"/home/dansim/LoFTR\")");
     PyRun_SimpleString("sys.path.append(\"/home/dansim/LoFTR/demo\")");

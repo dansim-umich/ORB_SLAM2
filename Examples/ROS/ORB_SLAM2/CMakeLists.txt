@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
+# dansim
+set(Python_ADDITIONAL_VERSIONS 3.6)
+find_package(PythonInterp 3.6 REQUIRED)
+find_package(PythonLibs 3.6 REQUIRED)
+find_package(Boost COMPONENTS system filesystem REQUIRED)
+# dansim
+
 rosbuild_init()
 
 IF(NOT ROS_BUILD_TYPE)
@@ -41,14 +48,14 @@ endif()
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 
-# added
-find_package(Boost COMPONENTS system filesystem REQUIRED)
-
 include_directories(
 ${PROJECT_SOURCE_DIR}
 ${PROJECT_SOURCE_DIR}/../../../
 ${PROJECT_SOURCE_DIR}/../../../include
 ${Pangolin_INCLUDE_DIRS}
+# dansim
+${PYTHON_INCLUDE_DIRS}
+# dansim
 )
 
 set(LIBS 
@@ -58,9 +65,11 @@ ${Pangolin_LIBRARIES}
 ${PROJECT_SOURCE_DIR}/../../../Thirdparty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/../../../Thirdparty/g2o/lib/libg2o.so
 ${PROJECT_SOURCE_DIR}/../../../lib/libORB_SLAM2.so
-# added
+# dansim
 ${Boost_FILESYSTEM_LIBRARY}
 ${Boost_SYSTEM_LIBRARY}
+${PYTHON_LIBRARIES}
+# dansim
 )
 
 # Node for monocular camera
