@@ -77,10 +77,10 @@ def match_images(arg1, arg2):
     img1_raw = cv2.resize(img1_raw, (img1_raw.shape[1]//8*8, img1_raw.shape[0]//8*8))
 
 
-    img0 = torch.from_numpy(img0_raw)[None][None]
-    img1 = torch.from_numpy(img1_raw)[None][None]
-    img0 = img0.float()
-    img1 = img1.float()
+    img0 = torch.from_numpy(img0_raw)[None][None] / 255.
+    img1 = torch.from_numpy(img1_raw)[None][None] / 255.
+    # img0 = img0.float()
+    # img1 = img1.float()
 
     """ Display both images: """
     if(0):

@@ -236,18 +236,18 @@ int call_py(const char *fileName, const char *funcName, cv::Mat img1, cv::Mat im
             }
 
             // Visualize vector
-            for(int i = 0; i < N; i++)
-            {
-                std::cout << mkpts0.at(i).at(0) << "\t" << mkpts0.at(i).at(1) << "\n";
-                std::cout << mkpts1.at(i).at(0) << "\t" << mkpts1.at(i).at(1) << "\n";
-                for(int j = 0; j < 348; j++)
-                    std::cout << fm0.at(i).at(j) << " ";
-                std::cout << "\n";
-                for(int j = 0; j < 348; j++)
-                    std::cout << fm1.at(i).at(j) << " ";
-                std::cout << "\n";
-                std::cout << "==============\n";
-            }
+            // for(int i = 0; i < N; i++)
+            // {
+            //     std::cout << mkpts0.at(i).at(0) << "\t" << mkpts0.at(i).at(1) << "\n";
+            //     std::cout << mkpts1.at(i).at(0) << "\t" << mkpts1.at(i).at(1) << "\n";
+            //     for(int j = 0; j < 348; j++)
+            //         std::cout << fm0.at(i).at(j) << " ";
+            //     std::cout << "\n";
+            //     for(int j = 0; j < 348; j++)
+            //         std::cout << fm1.at(i).at(j) << " ";
+            //     std::cout << "\n";
+            //     std::cout << "==============\n";
+            // }
 
             Py_DECREF(pArgs);
             if (pValue != NULL) {
