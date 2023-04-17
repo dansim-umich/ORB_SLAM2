@@ -41,6 +41,10 @@ endif()
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 
+set(Python_ADDITIONAL_VERSIONS 3.6)
+find_package(PythonInterp REQUIRED)
+find_package(PythonLibs REQUIRED)
+
 # added
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
@@ -49,6 +53,7 @@ ${PROJECT_SOURCE_DIR}
 ${PROJECT_SOURCE_DIR}/../../../
 ${PROJECT_SOURCE_DIR}/../../../include
 ${Pangolin_INCLUDE_DIRS}
+${PYTHON_INCLUDE_DIRS}
 )
 
 set(LIBS 
@@ -90,6 +95,7 @@ src/ros_stereo.cc
 
 target_link_libraries(Stereo
 ${LIBS}
+${PYTHON_LIBRARIES}
 )
 
 # Node for RGB-D camera
