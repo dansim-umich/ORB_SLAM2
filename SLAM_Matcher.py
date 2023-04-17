@@ -46,8 +46,8 @@ def match_images(arg1, arg2):
     matcher = LoFTR(config=default_cfg, apply_mask=apply_mask)
 
     # os.chdir("/home/dansim/LoFTR")
-    img0_raw = np.load("img0.npy")
-    img1_raw = np.load("img1.npy")
+    # img0_raw = np.load("img0.npy")
+    # img1_raw = np.load("img1.npy")
 
     # print(img0_raw.shape)
     # print(img1_raw.shape)
@@ -57,8 +57,8 @@ def match_images(arg1, arg2):
     # print("===========\n")
 
 
-    # img0_raw = cv2.resize(arg1, (672, 376))
-    # img1_raw = cv2.resize(arg2, (672, 376))
+    img0_raw = cv2.resize(arg1, (672, 376))
+    img1_raw = cv2.resize(arg2, (672, 376))
 
 
     matcher.load_state_dict(torch.load("weights/outdoor_ds.ckpt")['state_dict'])
@@ -170,8 +170,8 @@ def match_images(arg1, arg2):
     # print(f"{fm0_size}")
     # return [[1, 2], [3, 4]]
 
-    return 1
-    # return [len(mkpts0), mkpts0, mkpts1, fm0, fm1]
+    # return 1
+    return [len(mkpts0), mkpts0, mkpts1, fm0, fm1]
     # return [3, [[100, 200.12], [300.19, 400], [500, 4.99]]]
     
 
