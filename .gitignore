@@ -27,3 +27,4 @@ FrameTrajectory_TUM_Format.txt
 KeyFrameTrajectory_TUM_Format.txt
 
 *.yml.gz
+__pycache__

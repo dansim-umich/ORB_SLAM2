@@ -23,9 +23,86 @@
 #include "ORBmatcher.h"
 #include <thread>
 #include <cstdlib>
+#include <Python.h>
+#include <numpy/arrayobject.h>
 
 namespace ORB_SLAM2
 {
+
+int call_py(const char *fileName, const char *funcName, const char *arg1, const char *arg2)
+{
+    PyObject *pName, *pModule, *pFunc;
+    PyObject *pArgs, *pValue;
+
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString("sys.path.append(\".\")");
+    // PyRun_SimpleString("import SLAM_Matcher");
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
+
+    // abort();
+
+    pName = PyUnicode_DecodeFSDefault("SLAM_Matcher");
+    /* Error checking of pName left out */
+
+    pModule = PyImport_Import(pName);
+    // pModule = PyImport_ImportModule("SLAM_Matcher");
+    // abort();
+    Py_DECREF(pName);
+
+    if (pModule != NULL) {
+        pFunc = PyObject_GetAttrString(pModule, funcName);
+        /* pFunc is a new reference */
+
+        if (pFunc && PyCallable_Check(pFunc)) {
+            pArgs = PyTuple_New(2);
+            pValue = PyUnicode_FromString(arg1);
+            if (!pValue) {
+                Py_DECREF(pArgs);
+                Py_DECREF(pModule);
+                fprintf(stderr, "Cannot convert argument\n");
+                return 1;
+            }
+            /* pValue reference stolen here: */
+            PyTuple_SetItem(pArgs, 0, pValue);
+            pValue = PyUnicode_FromString(arg2);
+            if (!pValue) {
+                Py_DECREF(pArgs);
+                Py_DECREF(pModule);
+                fprintf(stderr, "Cannot convert argument\n");
+                return 1;
+            }
+            /* pValue reference stolen here: */
+            PyTuple_SetItem(pArgs, 1, pValue);
+            pValue = PyObject_CallObject(pFunc, pArgs);
+            Py_DECREF(pArgs);
+            if (pValue != NULL) {
+                printf("Result of call: %ld\n", PyLong_AsLong(pValue));
+                Py_DECREF(pValue);
+            }
+            else {
+                Py_DECREF(pFunc);
+                Py_DECREF(pModule);
+                PyErr_Print();
+                fprintf(stderr,"Call failed\n");
+                return 1;
+            }
+        }
+        else {
+            if (PyErr_Occurred())
+                PyErr_Print();
+            fprintf(stderr, "Cannot find function \"%s\"\n", funcName);
+        }
+        Py_XDECREF(pFunc);
+        Py_DECREF(pModule);
+    }
+    else {
+        PyErr_Print();
+        fprintf(stderr, "Failed to load \"%s\"\n", fileName);
+        return 1;
+    }
+
+    return 0;
+}
 
 long unsigned int Frame::nNextId=0;
 bool Frame::mbInitialComputations=true;
@@ -70,6 +147,10 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 
     nRows_pyramid = imLeft.rows;
 
+    // std::cout << "Working on calling python embedding...\n";
+    call_py("SLAM_Matcher", "match_images", " ", " ");
+    // std::cout << "Called python embedding successfully!!\n\n";
+
     // Scale Level Info
     mnScaleLevels = mpORBextractorLeft->GetLevels();
     mfScaleFactor = mpORBextractorLeft->GetScaleFactor();
@@ -80,16 +161,16 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
 
     // LoFTR - extraction and matching.
-    ExtractLoFTR_and_match(imLeft, imRight);
+    // ExtractLoFTR_and_match(imLeft, imRight);
 
     // ORB extraction
-    // thread threadLeft(&Frame::ExtractORB,this,0,imLeft);
-    // thread threadRight(&Frame::ExtractORB,this,1,imRight);
-    // threadLeft.join();
-    // threadRight.join();
+    thread threadLeft(&Frame::ExtractORB,this,0,imLeft);
+    thread threadRight(&Frame::ExtractORB,this,1,imRight);
+    threadLeft.join();
+    threadRight.join();
 
-    cout << "mDescriptor[0]: " << mDescriptors.size() << "\n";
-    cout << "mDescriptor[1]: " << mDescriptorsRight.size() << "\n";
+    // cout << "mDescriptor[0]: " << mDescriptors.size() << "\n";
+    // cout << "mDescriptor[1]: " << mDescriptorsRight.size() << "\n";
 
 
     N = mvKeys.size();
@@ -99,7 +180,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 
     UndistortKeyPoints();
 
-    // ComputeStereoMatches();
+    ComputeStereoMatches();
 
     // for(int i = 0; i < mvDepth.size(); i++)
     // {
@@ -299,11 +380,11 @@ void Frame::ExtractLoFTR_and_match(const cv::Mat &imLeft, const cv::Mat &imRight
     */
 
     // Use random vectors to find keypoints and feature vectors
-    // mDescriptors.create(1200, 32, CV_16U);
-    // mDescriptorsRight.create(1200, 32, CV_16U);
+    mDescriptors.create(1200, 32, CV_16U);
+    mDescriptorsRight.create(1200, 32, CV_16U);
 
-    mDescriptors.create(1200, 384, CV_16U);
-    mDescriptorsRight.create(1200, 384, CV_16U);
+    // mDescriptors.create(1200, 384, CV_16U);
+    // mDescriptorsRight.create(1200, 384, CV_16U);
 
     cv::randu(mDescriptors, cv::Scalar(0), cv::Scalar(300));
     cv::randu(mDescriptorsRight, cv::Scalar(0), cv::Scalar(300));
