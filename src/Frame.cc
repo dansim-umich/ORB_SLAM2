@@ -104,6 +104,15 @@ int call_py_no_args(const char *fileName, const char *funcName, const char *arg1
     return 0;
 }
 
+/*
+    TODO:
+    1. Modify call_py to have relevant data passed as reference and store output of LoFTR correctly in that data
+    2. Check LoFTR and see why we have so few matches
+    3. Train new vocab - Modify DBoW2 slightly
+    4. Use this function inside ORB SLAM 2
+*/
+
+
 int call_py(const char *fileName, const char *funcName, cv::Mat img1, cv::Mat img2)
 {
     PyObject *pName, *pModule, *pFunc;
