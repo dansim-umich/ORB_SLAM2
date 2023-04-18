@@ -113,7 +113,9 @@ int call_py_no_args(const char *fileName, const char *funcName, const char *arg1
 */
 
 
-int call_py(const char *fileName, const char *funcName, cv::Mat img1, cv::Mat img2)
+int call_py(const char *fileName, const char *funcName, cv::Mat img1, cv::Mat img2, std::vector<cv::KeyPoint> &mvKeys, 
+                std::vector<cv::KeyPoint> &mvKeysRight, cv::Mat &mDescriptors, cv::Mat &mDescriptorsRight,
+                std::vector<float> &mvuRight, std::vector<float> &mvDepth)
 {
     PyObject *pName, *pModule, *pFunc;
     PyObject *pArgs, *pValue, *output_array;
@@ -187,53 +189,81 @@ int call_py(const char *fileName, const char *funcName, cv::Mat img1, cv::Mat im
 
             std::cout << "N: " << N << "\n";
 
+            mvuRight.clear();
+            // mvuRight = vector<float>(int(N / 2),-1.0f);
+            mvDepth.clear();
+            // mvDepth = vector<float>(int(N / 2),-1.0f);
+
+            mvKeys.clear();
+            mvKeysRight.clear();
+            mDescriptors.create(int(N / 2), 384, CV_64FC1);
+            mDescriptorsRight.create(int(N / 2), 384, CV_64FC1);
+
             output_array = PyList_GetItem(pValue, 1);
-            std::vector<std::vector<double>> mkpts0;
-            for(int i = 0; i < N; i++)
+            // std::vector<std::vector<double>> mkpts0;
+            // for(int i = 0; i < N; i++)
+            // {
+            //     std::vector<double> row;
+
+            //     row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 0)));
+            //     row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 1)));
+
+            //     mkpts0.push_back(row);
+            // }
+            for(int i = 0; i < int(N / 2); i++)
             {
-                std::vector<double> row;
-
-                row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 0)));
-                row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 1)));
-
-                mkpts0.push_back(row);
+                float uL = PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 0));
+                float vL = PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 1));
+                cv::KeyPoint kp(uL, vL, 31);
+                mvKeys.push_back(kp);
             }
+
 
             output_array = PyList_GetItem(pValue, 2);
-            std::vector<std::vector<double>> mkpts1;
-            for(int i = 0; i < N; i++)
+            // std::vector<std::vector<double>> mkpts1;
+            // for(int i = 0; i < N; i++)
+            // {
+            //     std::vector<double> row;
+
+            //     row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 0)));
+            //     row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 1)));
+
+            //     mkpts1.push_back(row);
+            // }
+            for(int i = 0; i < int(N / 2); i++)
             {
-                std::vector<double> row;
+                float uR = PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 0));
+                // int vR = rng.uniform(0, 300);
+                cv::KeyPoint kp = cv::KeyPoint(uR, mvKeys.at(i).pt.y, 31);
+                mvKeysRight.push_back(kp);
 
-                row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 0)));
-                row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), 1)));
-
-                mkpts1.push_back(row);
+                mvuRight.push_back(uR);
+                mvDepth.push_back(5);
             }
+
+            // std::cout << "\tmvuRight size after: " << mvuRight.size() << "\n";
+            // std::cout << mDescriptorsRight.size() << "\n";
+            // abort();
 
             output_array = PyList_GetItem(pValue, 3);
-            std::vector<std::vector<double>> fm0;
-            for(int i = 0; i < N; i++)
+            // std::vector<std::vector<double>> fm0;
+            for(int i = 0; i < int(N / 2); i++)
             {
-                std::vector<double> row;
-
                 for(int j = 0; j < 348; j++)
-                    row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), j)));
-
-                fm0.push_back(row);
+                    mDescriptors.at<double>(i, j) = PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), j));
             }
+
+
 
             output_array = PyList_GetItem(pValue, 4);
-            std::vector<std::vector<double>> fm1;
-            for(int i = 0; i < N; i++)
+            // std::vector<std::vector<double>> fm1;
+            for(int i = 0; i < int(N / 2); i++)
             {
-                std::vector<double> row;
-
                 for(int j = 0; j < 348; j++)
-                    row.push_back(PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), j)));
-
-                fm1.push_back(row);
+                    mDescriptorsRight.at<double>(i, j) = PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(output_array, i), j));
             }
+
+            // abort();
 
             // Visualize vector
             // for(int i = 0; i < N; i++)
@@ -323,9 +353,19 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 
     std::cout << "Working on calling python embedding...\n";
     // call_py("SLAM_Matcher", "match_images", " ", " ");
-    call_py("SLAM_Matcher", "match_images", imLeft, imRight);
+    call_py("SLAM_Matcher", "match_images", imLeft, imRight, mvKeys, mvKeysRight, 
+                mDescriptors, mDescriptorsRight, mvuRight, mvDepth);
     // abort();
     // std::cout << "Called python embedding successfully!!\n\n";
+
+    // std::cout << "_________________________________________________\n";
+    // std::cout << "mvKeys.size(): " << mvKeys.size() << "\n";
+    // std::cout << "mvKeysRight.size(): " << mvKeysRight.size() << "\n";
+    // std::cout << "mDescriptors.size(): " << mDescriptors.size() << "\n";
+    // std::cout << "mDescriptorsRight.size(): " << mDescriptorsRight.size() << "\n";
+    // std::cout << "mvuRight.size(): " << mvuRight.size() << "\n";
+    // std::cout << "mvDepth.size(): " << mvDepth.size() << "\n";
+
 
     // Scale Level Info
     mnScaleLevels = mpORBextractorLeft->GetLevels();
@@ -339,13 +379,18 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     // LoFTR - extraction and matching.
     // ExtractLoFTR_and_match(imLeft, imRight);
 
-    // ORB extraction
-    thread threadLeft(&Frame::ExtractORB,this,0,imLeft);
-    thread threadRight(&Frame::ExtractORB,this,1,imRight);
-    threadLeft.join();
-    threadRight.join();
+    // abort();
 
-    // cout << "mDescriptor[0]: " << mDescriptors.size() << "\n";
+    // ORB extraction
+    // thread threadLeft(&Frame::ExtractORB,this,0,imLeft);
+    // thread threadRight(&Frame::ExtractORB,this,1,imRight);
+    // threadLeft.join();
+    // threadRight.join();
+
+    // cv::Mat test(1200, 32, CV_8U);
+
+    // cout << test.rows << " x " << test.cols << "\n";
+    // cout << "mDescriptor[0]: " << mDescriptors.rows << " x " << mDescriptors.cols << "\n";
     // cout << "mDescriptor[1]: " << mDescriptorsRight.size() << "\n";
 
 
@@ -356,7 +401,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 
     UndistortKeyPoints();
 
-    ComputeStereoMatches();
+    // ComputeStereoMatches();
 
     // for(int i = 0; i < mvDepth.size(); i++)
     // {
